@@ -51,6 +51,13 @@ public class IO {
     }
 
     @Test
+    public void testBool() {
+        Codec<Boolean> codec = Codecs.BOOL;
+        validateExactly(false, codec, 0x00);
+        validateExactly(true, codec, 0x01);
+    }
+
+    @Test
     public void testI8() {
         Codec<Byte> codec = Codecs.I8;
         validateExactly((byte) 0,    codec, 0x00);
@@ -189,7 +196,13 @@ public class IO {
 
     record Vec3d(double x, double y, double z) {
 
-        public static final Codec<Vec3d> CODEC = new Codec<>() {
+        public static final Codec<Vec3d> CODEC = Codec.composite(Vec3d::new,
+            Codecs.F64, Vec3d::x,
+            Codecs.F64, Vec3d::y,
+            Codecs.F64, Vec3d::z
+        );
+
+        public static final Codec<Vec3d> KINDA_WORKS_BUT_THIS_IS_A_SHITTY_SOLUTION_CODEC = new Codec<>() {
 
             @Override
             public Vec3d decode(DataInputWrapper in) throws IOException {
@@ -210,6 +223,7 @@ public class IO {
     @Test
     public void testCustom() {
         validate(new Vec3d(420, 69, 0), Vec3d.CODEC, 3 * 8);
+        validate(new Vec3d(420, 69, 0), Vec3d.KINDA_WORKS_BUT_THIS_IS_A_SHITTY_SOLUTION_CODEC, 3 * 8);
     }
 
 }

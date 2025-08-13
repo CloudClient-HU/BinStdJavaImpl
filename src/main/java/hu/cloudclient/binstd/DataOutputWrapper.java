@@ -24,6 +24,10 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
         return delegate.toByteArray();
     }
 
+    public void writeBool(boolean value) throws IOException {
+        delegate.writeBoolean(value);
+    }
+
     public void write8(int value) throws IOException {
         delegate.writeByte(value);
     }

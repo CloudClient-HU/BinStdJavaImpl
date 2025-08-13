@@ -4,6 +4,20 @@ import java.io.IOException;
 
 public final class Codecs {
 
+    public static final Codec<Boolean> BOOL = new Codec<>() {
+
+        @Override
+        public Boolean decode(DataInputWrapper in) throws IOException {
+            return in.readBool();
+        }
+
+        @Override
+        public void encode(DataOutputWrapper out, Boolean value) throws IOException {
+            out.writeBool(value);
+        }
+
+    };
+
     public static final Codec<Byte> I8 = new Codec<>() {
 
         @Override

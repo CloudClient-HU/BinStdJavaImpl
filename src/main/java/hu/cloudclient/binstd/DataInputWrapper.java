@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.DataInput;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
@@ -154,9 +153,8 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> T[] readFixedArray(Class<T> clazz, Decoder<T> decoder, int length) throws IOException {
-        T[] array = (T[]) Array.newInstance(clazz, length);
+    public <T> T[] readFixedArray(IntFunction<T[]> factory, Decoder<T> decoder, int length) throws IOException {
+        T[] array = factory.apply(length);
         for (int i = 0; i < length; i++) {
             array[i] = decoder.decode(this);
         }
@@ -180,12 +178,22 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
         return bytes;
     }
 
-    public <T> T[] readDynArray(Class<T> clazz, Decoder<T> decoder) throws IOException {
-        return readFixedArray(clazz, decoder, validate(readVar32(), config.maxArrayLength));
+    public int[] readFixedVar32Array(int length) throws IOException {
+        int[] ints = new int[length];
+
+        for (int i = 0; i < length; i++) {
+            ints[i] = readVar32();
+        }
+
+        return ints;
     }
 
-    public <T> T[] readDynArray(Class<T> clazz, Decoder<T> decoder, int maxLength) throws IOException {
-        return readFixedArray(clazz, decoder, validate(readVar32(), maxLength));
+    public <T> T[] readDynArray(IntFunction<T[]> factory, Decoder<T> decoder) throws IOException {
+        return readFixedArray(factory, decoder, validate(readVar32(), config.maxArrayLength));
+    }
+
+    public <T> T[] readDynArray(IntFunction<T[]> factory, Decoder<T> decoder, int maxLength) throws IOException {
+        return readFixedArray(factory, decoder, validate(readVar32(), maxLength));
     }
 
     public <T, C extends Collection<T>> C readDynArrayAsCollection(IntFunction<C> collectionFactory, Decoder<T> decoder) throws IOException {
@@ -202,6 +210,14 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
 
     public byte[] readDynI8Array(int maxLength) throws IOException {
         return readFixedI8Array(validate(readVar32(), maxLength));
+    }
+
+    public int[] readDynVar32Array() throws IOException {
+        return readFixedVar32Array(validate(readVar32(), config.maxArrayLength));
+    }
+
+    public int[] readDynVar32Array(int maxLength) throws IOException {
+        return readFixedVar32Array(validate(readVar32(), maxLength));
     }
 
     public <K, V, M extends Map<K, V>> M readFixedMap(IntFunction<M> mapFactory, Decoder<K> keyDecoder, Decoder<V> valueDecoder, int size) throws IOException {

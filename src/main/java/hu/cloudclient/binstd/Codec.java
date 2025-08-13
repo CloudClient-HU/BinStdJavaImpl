@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public interface Codec<T> extends Encoder<T>, Decoder<T> {
 
@@ -791,6 +792,22 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
             @Override
             public void encode(DataOutputWrapper out, Optional<T> value) throws IOException {
                 out.writeNullable(value.orElse(null), Codec.this);
+            }
+
+        };
+    }
+
+    default Codec<T[]> array(IntFunction<T[]> factory) {
+        return new Codec<>() {
+
+            @Override
+            public T[] decode(DataInputWrapper in) throws IOException {
+                return in.readDynArray(factory, Codec.this);
+            }
+
+            @Override
+            public void encode(DataOutputWrapper out, T[] value) throws IOException {
+                out.writeDynArray(value, Codec.this);
             }
 
         };

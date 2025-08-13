@@ -32,6 +32,20 @@ public final class Codecs {
 
     };
 
+    public static final Codec<byte[]> I8_ARRAY = new Codec<>() {
+
+        @Override
+        public byte[] decode(DataInputWrapper in) throws IOException {
+            return in.readDynI8Array();
+        }
+
+        @Override
+        public void encode(DataOutputWrapper out, byte[] value) throws IOException {
+            out.writeDyn8Array(value);
+        }
+
+    };
+
     public static final Codec<Integer> U8 = new Codec<>() {
 
         @Override
@@ -112,6 +126,20 @@ public final class Codecs {
         @Override
         public Integer decode(DataInputWrapper in) throws IOException {
             return in.readVar32();
+        }
+
+    };
+
+    public static final Codec<int[]> VAR32_ARRAY = new Codec<>() {
+
+        @Override
+        public int[] decode(DataInputWrapper in) throws IOException {
+            return in.readDynVar32Array();
+        }
+
+        @Override
+        public void encode(DataOutputWrapper out, int[] value) throws IOException {
+            out.writeDynVar32Array(value);
         }
 
     };

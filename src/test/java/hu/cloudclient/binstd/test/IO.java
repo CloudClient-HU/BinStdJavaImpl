@@ -5,6 +5,7 @@ import hu.cloudclient.binstd.Codecs;
 import hu.cloudclient.binstd.DataInputWrapper;
 import hu.cloudclient.binstd.DataOutputWrapper;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -60,16 +61,16 @@ public class IO {
     @Test
     public void testI8() {
         Codec<Byte> codec = Codecs.I8;
-        validateExactly((byte) 0,    codec, 0x00);
-        validateExactly((byte) 127,  codec, 0x7F);
+        validateExactly((byte) 0, codec, 0x00);
+        validateExactly((byte) 127, codec, 0x7F);
         validateExactly((byte) -128, codec, 0x80);
-        validateExactly((byte) -1,   codec, 0xFF);
+        validateExactly((byte) -1, codec, 0xFF);
     }
 
     @Test
     public void testU8() {
         Codec<Integer> codec = Codecs.U8;
-        validateExactly(0,   codec, 0x00);
+        validateExactly(0, codec, 0x00);
         validateExactly(127, codec, 0x7F);
         validateExactly(255, codec, 0xFF);
     }
@@ -77,16 +78,16 @@ public class IO {
     @Test
     public void testI16() {
         Codec<Short> codec = Codecs.I16;
-        validateExactly((short) 0,      codec, 0x00, 0x00);
-        validateExactly((short) 32767,  codec, 0x7F, 0xFF);
+        validateExactly((short) 0, codec, 0x00, 0x00);
+        validateExactly((short) 32767, codec, 0x7F, 0xFF);
         validateExactly((short) -32768, codec, 0x80, 0x00);
-        validateExactly((short) -1,     codec, 0xFF, 0xFF);
+        validateExactly((short) -1, codec, 0xFF, 0xFF);
     }
 
     @Test
     public void testU16() {
         Codec<Integer> codec = Codecs.U16;
-        validateExactly(0,     codec, 0x00, 0x00);
+        validateExactly(0, codec, 0x00, 0x00);
         validateExactly(32767, codec, 0x7F, 0xFF);
         validateExactly(65535, codec, 0xFF, 0xFF);
     }
@@ -94,59 +95,59 @@ public class IO {
     @Test
     public void testI32() {
         Codec<Integer> codec = Codecs.I32;
-        validateExactly(0,           codec, 0x00, 0x00, 0x00, 0x00);
-        validateExactly(2147483647,  codec, 0x7F, 0xFF, 0xFF, 0xFF);
+        validateExactly(0, codec, 0x00, 0x00, 0x00, 0x00);
+        validateExactly(2147483647, codec, 0x7F, 0xFF, 0xFF, 0xFF);
         validateExactly(-2147483648, codec, 0x80, 0x00, 0x00, 0x00);
-        validateExactly(-1,          codec, 0xFF, 0xFF, 0xFF, 0xFF);
+        validateExactly(-1, codec, 0xFF, 0xFF, 0xFF, 0xFF);
     }
 
     @Test
     public void testI64() {
         Codec<Long> codec = Codecs.I64;
-        validateExactly(0L,                    codec, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
-        validateExactly(9223372036854775807L,  codec, 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF);
+        validateExactly(0L, codec, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
+        validateExactly(9223372036854775807L, codec, 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF);
         validateExactly(-9223372036854775808L, codec, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
-        validateExactly(-1L,                   codec, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF);
+        validateExactly(-1L, codec, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF);
     }
 
     @Test
     public void testVar32() {
         Codec<Integer> codec = Codecs.VAR32;
-        validate(0,         codec, 1);
-        validate(127,       codec, 1);
-        validate(128,       codec, 2);
-        validate(16383,     codec, 2);
-        validate(16384,     codec, 3);
-        validate(2097151,   codec, 3);
-        validate(2097152,   codec, 4);
+        validate(0, codec, 1);
+        validate(127, codec, 1);
+        validate(128, codec, 2);
+        validate(16383, codec, 2);
+        validate(16384, codec, 3);
+        validate(2097151, codec, 3);
+        validate(2097152, codec, 4);
         validate(268435455, codec, 4);
         validate(268435456, codec, 5);
-        validate(-1,        codec, 5);
+        validate(-1, codec, 5);
     }
 
     @Test
     public void testVar64() {
         Codec<Long> codec = Codecs.VAR64;
-        validate(0L,                    codec, 1);
-        validate(127L,                  codec, 1);
-        validate(128L,                  codec, 2);
-        validate(16383L,                codec, 2);
-        validate(16384L,                codec, 3);
-        validate(2097151L,              codec, 3);
-        validate(2097152L,              codec, 4);
-        validate(268435455L,            codec, 4);
-        validate(268435456L,            codec, 5);
-        validate(34359738367L,          codec, 5);
-        validate(34359738368L,          codec, 6);
-        validate(4398046511103L,        codec, 6);
-        validate(4398046511104L,        codec, 7);
-        validate(562949953421311L,      codec, 7);
-        validate(562949953421312L,      codec, 8);
-        validate(72057594037927935L,    codec, 8);
-        validate(72057594037927936L,    codec, 9);
-        validate(9223372036854775807L,  codec, 9);
+        validate(0L, codec, 1);
+        validate(127L, codec, 1);
+        validate(128L, codec, 2);
+        validate(16383L, codec, 2);
+        validate(16384L, codec, 3);
+        validate(2097151L, codec, 3);
+        validate(2097152L, codec, 4);
+        validate(268435455L, codec, 4);
+        validate(268435456L, codec, 5);
+        validate(34359738367L, codec, 5);
+        validate(34359738368L, codec, 6);
+        validate(4398046511103L, codec, 6);
+        validate(4398046511104L, codec, 7);
+        validate(562949953421311L, codec, 7);
+        validate(562949953421312L, codec, 8);
+        validate(72057594037927935L, codec, 8);
+        validate(72057594037927936L, codec, 9);
+        validate(9223372036854775807L, codec, 9);
         validate(-9223372036854775808L, codec, 10);
-        validate(-1L,                   codec, 10);
+        validate(-1L, codec, 10);
     }
 
     @Test
@@ -224,6 +225,64 @@ public class IO {
     public void testCustom() {
         validate(new Vec3d(420, 69, 0), Vec3d.CODEC, 3 * 8);
         validate(new Vec3d(420, 69, 0), Vec3d.KINDA_WORKS_BUT_THIS_IS_A_SHITTY_SOLUTION_CODEC, 3 * 8);
+    }
+
+    @Test
+    public void testArrays() {
+        try {
+            Codec<int[]> codec = Codecs.VAR32_ARRAY;
+            int[] values = {420, 69, 0, 12, 74};
+            byte[] bytes = DataOutputWrapper.encodeAndGetBytes(codec.asEncodable(values));
+
+            DataInputWrapper in = new DataInputWrapper(bytes);
+            assertArrayEquals(codec.decode(in), values);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            Codec<byte[]> codec = Codecs.I8_ARRAY;
+            byte[] values = {42, -69, 0, 12, 74};
+            byte[] bytes = DataOutputWrapper.encodeAndGetBytes(codec.asEncodable(values));
+
+            DataInputWrapper in = new DataInputWrapper(bytes);
+            assertArrayEquals(codec.decode(in), values);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            Codec<Vec3d[]> codec = Vec3d.CODEC.array(Vec3d[]::new);
+            Vec3d[] values = {new Vec3d(1, 2, 3), new Vec3d(4, 5, 6)};
+            byte[] bytes = DataOutputWrapper.encodeAndGetBytes(codec.asEncodable(values));
+
+            DataInputWrapper in = new DataInputWrapper(bytes);
+            assertArrayEquals(codec.decode(in), values);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    record BedwarsTeam(@Range(from = 0, to = 7) int playersAlive, TeamColor color) {
+
+        public static final Codec<BedwarsTeam> CODEC = Codecs.U8.map(
+            i -> new BedwarsTeam(i >> 2 & 0b1111, TeamColor.values()[i & 0b0000_11]),
+            team -> team.playersAlive << 2 | team.color.ordinal()
+        );
+
+    }
+
+    enum TeamColor {
+        RED,
+        YELLOW,
+        GREEN,
+        BLUE
+    }
+
+    @Test
+    public void codecMapTest() {
+        validateExactly(new BedwarsTeam(4, TeamColor.RED), BedwarsTeam.CODEC, 0b0100_00);
+        validateExactly(new BedwarsTeam(6, TeamColor.YELLOW), BedwarsTeam.CODEC, 0b0110_01);
     }
 
 }

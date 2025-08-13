@@ -130,6 +130,12 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
         delegate.write(array);
     }
 
+    public void writeFixedVar32Array(int[] array) throws IOException {
+        for (int i : array) {
+            writeVar32(i);
+        }
+    }
+
     public <T extends Encodable> void writeDynArray(T[] array) throws IOException {
         writeVar32(array.length);
         writeFixedArray(array);
@@ -153,6 +159,14 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
     public void writeDyn8Array(byte[] array) throws IOException {
         writeVar32(array.length);
         writeFixed8Array(array);
+    }
+
+    public void writeDynVar32Array(int[] array) throws IOException {
+        writeVar32(array.length);
+
+        for (int i : array) {
+            writeVar32(i);
+        }
     }
 
     public <K extends Encodable, V extends Encodable> void writeFixedMap(Map<K, V> map) throws IOException {

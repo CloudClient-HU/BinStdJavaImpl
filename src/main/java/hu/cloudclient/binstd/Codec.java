@@ -4,6 +4,7 @@ import hu.cloudclient.binstd.function.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -808,6 +809,22 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
             @Override
             public void encode(DataOutputWrapper out, T[] value) throws IOException {
                 out.writeDynArray(value, Codec.this);
+            }
+
+        };
+    }
+
+    default <C extends Collection<T>> Codec<C> collection(IntFunction<C> factory) {
+        return new Codec<>() {
+
+            @Override
+            public C decode(DataInputWrapper in) throws IOException {
+                return in.readDynArrayAsCollection(factory, Codec.this);
+            }
+
+            @Override
+            public void encode(DataOutputWrapper out, C value) throws IOException {
+                out.writeDynCollection(value, Codec.this);
             }
 
         };

@@ -265,7 +265,7 @@ public class IO {
 
     record BedwarsTeam(@Range(from = 0, to = 63) int playersAlive, TeamColor color) {
 
-        public static final Codec<BedwarsTeam> CODEC = Codecs.U8.map(
+        public static final Codec<BedwarsTeam> CODEC = Codecs.U8.xmap(
             i -> new BedwarsTeam(i >> 2 & 0b1111, TeamColor.values()[i & 0b0000_11]),
             team -> team.playersAlive << 2 | team.color.ordinal()
         );

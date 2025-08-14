@@ -830,7 +830,7 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
         };
     }
 
-    default <NT> Codec<NT> map(Function<? super T, ? extends NT> factory, Function<? super NT, ? extends T> getter) {
+    default <NT> Codec<NT> xmap(Function<? super T, ? extends NT> factory, Function<? super NT, ? extends T> getter) {
         return new Codec<>() {
 
             @Override

@@ -9,6 +9,8 @@ import org.jetbrains.annotations.Range;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,7 +21,7 @@ public class IO {
         try {
             byte[] bytes = DataOutputWrapper.encodeAndGetBytes(value, codec);
 
-            assertEquals(bytes.length, numExpectedBytes);
+            assertEquals(numExpectedBytes, bytes.length);
 
             DataInputWrapper in = new DataInputWrapper(bytes);
             assertEquals(codec.decode(in), value);
@@ -283,6 +285,13 @@ public class IO {
     public void codecMapTest() {
         validateExactly(new BedwarsTeam(4, TeamColor.RED), BedwarsTeam.CODEC, 0b0100_00);
         validateExactly(new BedwarsTeam(6, TeamColor.YELLOW), BedwarsTeam.CODEC, 0b0110_01);
+    }
+
+    @Test
+    public void mapTest() {
+        Codec<Map<Integer, String>> codec = Codec.map(HashMap::new, Codecs.VAR32, Codecs.UTF8);
+        Map<Integer, String> playerIDToNameMap = Map.of(0, "Pistike", 7, "Sanyika", 4, "Ferike");
+        validate(playerIDToNameMap, codec, 1 + 1 + 1 + 7 + 1 + 1 + 7 + 1 + 1 + 6);
     }
 
 }

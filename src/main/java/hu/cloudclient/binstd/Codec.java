@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -41,6 +42,22 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
                 if (value != instance) {
                     throw new IOException("value != instance");
                 }
+            }
+
+        };
+    }
+
+    static <K, V, M extends Map<K, V>> Codec<M> map(IntFunction<M> mapFactory, Codec<K> keyCodec, Codec<V> valueCodec) {
+        return new Codec<>() {
+
+            @Override
+            public M decode(DataInputWrapper in) throws IOException {
+                return in.readDynMap(mapFactory, keyCodec, valueCodec);
+            }
+
+            @Override
+            public void encode(DataOutputWrapper out, M value) throws IOException {
+                out.writeDynMap(value, keyCodec, valueCodec);
             }
 
         };

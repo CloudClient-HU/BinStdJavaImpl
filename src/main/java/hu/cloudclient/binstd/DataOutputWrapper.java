@@ -17,10 +17,10 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
         this(ByteStreams.newDataOutput());
     }
 
-    public static byte[] encodeAndGetBytes(Encodable encodable) throws IOException {
+    public static <T> byte[] encodeAndGetBytes(T value, Encoder<T> encoder) throws IOException {
         ByteArrayDataOutput delegate = ByteStreams.newDataOutput();
         DataOutputWrapper out = new DataOutputWrapper(delegate);
-        encodable.encode(out);
+        encoder.encode(out, value);
         return delegate.toByteArray();
     }
 
@@ -84,15 +84,6 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
         writeVar32(instance.ordinal());
     }
 
-    public <T extends Encodable> void writeNullable(@Nullable T encodable) throws IOException {
-        if (encodable == null) {
-            delegate.writeBoolean(false);
-        } else {
-            delegate.writeBoolean(true);
-            write(encodable);
-        }
-    }
-
     public <T> void writeNullable(@Nullable T value, Encoder<T> encoder) throws IOException {
         if (value == null) {
             delegate.writeBoolean(false);
@@ -102,21 +93,9 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
         }
     }
 
-    public <T extends Encodable> void writeFixedArray(T[] array) throws IOException {
-        for (T encodable : array) {
-            encodable.encode(this);
-        }
-    }
-
     public <T> void writeFixedArray(T[] array, Encoder<T> encoder) throws IOException {
         for (T t : array) {
             encoder.encode(this, t);
-        }
-    }
-
-    public <T extends Encodable> void writeFixedCollection(Collection<T> collection) throws IOException {
-        for (T encodable : collection) {
-            encodable.encode(this);
         }
     }
 
@@ -136,19 +115,9 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
         }
     }
 
-    public <T extends Encodable> void writeDynArray(T[] array) throws IOException {
-        writeVar32(array.length);
-        writeFixedArray(array);
-    }
-
     public <T> void writeDynArray(T[] array, Encoder<T> encoder) throws IOException {
         writeVar32(array.length);
         writeFixedArray(array, encoder);
-    }
-
-    public <T extends Encodable> void writeDynCollection(Collection<T> collection) throws IOException {
-        writeVar32(collection.size());
-        writeFixedCollection(collection);
     }
 
     public <T> void writeDynCollection(Collection<T> collection, Encoder<T> encoder) throws IOException {
@@ -169,47 +138,11 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
         }
     }
 
-    public <K extends Encodable, V extends Encodable> void writeFixedMap(Map<K, V> map) throws IOException {
-        for (Map.Entry<K, V> entry : map.entrySet()) {
-            entry.getKey().encode(this);
-            entry.getValue().encode(this);
-        }
-    }
-
-    public <K extends Encodable, V> void writeFixedMapKE(Map<K, V> map, Encoder<V> valueEncoder) throws IOException {
-        for (Map.Entry<K, V> entry : map.entrySet()) {
-            entry.getKey().encode(this);
-            valueEncoder.encode(this, entry.getValue());
-        }
-    }
-
-    public <K, V extends Encodable> void writeFixedMapVE(Map<K, V> map, Encoder<K> keyEncoder) throws IOException {
-        for (Map.Entry<K, V> entry : map.entrySet()) {
-            keyEncoder.encode(this, entry.getKey());
-            entry.getValue().encode(this);
-        }
-    }
-
     public <K, V> void writeFixedMap(Map<K, V> map, Encoder<K> keyEncoder, Encoder<V> valueEncoder) throws IOException {
         for (Map.Entry<K, V> entry : map.entrySet()) {
             keyEncoder.encode(this, entry.getKey());
             valueEncoder.encode(this, entry.getValue());
         }
-    }
-
-    public <K extends Encodable, V extends Encodable> void writeDynMap(Map<K, V> map) throws IOException {
-        writeVar32(map.size());
-        writeFixedMap(map);
-    }
-
-    public <K extends Encodable, V> void writeDynMapKE(Map<K, V> map, Encoder<V> valueEncoder) throws IOException {
-        writeVar32(map.size());
-        writeFixedMapKE(map, valueEncoder);
-    }
-
-    public <K, V extends Encodable> void writeDynMapVE(Map<K, V> map, Encoder<K> keyEncoder) throws IOException {
-        writeVar32(map.size());
-        writeFixedMapVE(map, keyEncoder);
     }
 
     public <K, V> void writeDynMap(Map<K, V> map, Encoder<K> keyEncoder, Encoder<V> valueEncoder) throws IOException {
@@ -219,10 +152,6 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
 
     public <T> void write(T value, Encoder<T> encoder) throws IOException {
         encoder.encode(this, value);
-    }
-
-    public <T extends Encodable> void write(T encodable) throws IOException {
-        encodable.encode(this);
     }
 
     @Deprecated

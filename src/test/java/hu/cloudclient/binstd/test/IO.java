@@ -17,7 +17,7 @@ public class IO {
 
     private static <T> void validate(T value, Codec<T> codec, int numExpectedBytes) {
         try {
-            byte[] bytes = DataOutputWrapper.encodeAndGetBytes(codec.asEncodable(value));
+            byte[] bytes = DataOutputWrapper.encodeAndGetBytes(value, codec);
 
             assertEquals(bytes.length, numExpectedBytes);
 
@@ -30,7 +30,7 @@ public class IO {
 
     private static <T> void validateExactly(T value, Codec<T> codec, int... expectedBytes) {
         try {
-            byte[] bytes = DataOutputWrapper.encodeAndGetBytes(codec.asEncodable(value));
+            byte[] bytes = DataOutputWrapper.encodeAndGetBytes(value, codec);
             byte[] actualExpectedBytes = asByteArray(expectedBytes);
             assertArrayEquals(actualExpectedBytes, bytes);
 
@@ -232,7 +232,7 @@ public class IO {
         try {
             Codec<int[]> codec = Codecs.VAR32_ARRAY;
             int[] values = {420, 69, 0, 12, 74};
-            byte[] bytes = DataOutputWrapper.encodeAndGetBytes(codec.asEncodable(values));
+            byte[] bytes = DataOutputWrapper.encodeAndGetBytes(values, codec);
 
             DataInputWrapper in = new DataInputWrapper(bytes);
             assertArrayEquals(codec.decode(in), values);
@@ -243,7 +243,7 @@ public class IO {
         try {
             Codec<byte[]> codec = Codecs.I8_ARRAY;
             byte[] values = {42, -69, 0, 12, 74};
-            byte[] bytes = DataOutputWrapper.encodeAndGetBytes(codec.asEncodable(values));
+            byte[] bytes = DataOutputWrapper.encodeAndGetBytes(values, codec);
 
             DataInputWrapper in = new DataInputWrapper(bytes);
             assertArrayEquals(codec.decode(in), values);
@@ -254,7 +254,7 @@ public class IO {
         try {
             Codec<Vec3d[]> codec = Vec3d.CODEC.array(Vec3d[]::new);
             Vec3d[] values = {new Vec3d(1, 2, 3), new Vec3d(4, 5, 6)};
-            byte[] bytes = DataOutputWrapper.encodeAndGetBytes(codec.asEncodable(values));
+            byte[] bytes = DataOutputWrapper.encodeAndGetBytes(values, codec);
 
             DataInputWrapper in = new DataInputWrapper(bytes);
             assertArrayEquals(codec.decode(in), values);
@@ -263,7 +263,7 @@ public class IO {
         }
     }
 
-    record BedwarsTeam(@Range(from = 0, to = 7) int playersAlive, TeamColor color) {
+    record BedwarsTeam(@Range(from = 0, to = 63) int playersAlive, TeamColor color) {
 
         public static final Codec<BedwarsTeam> CODEC = Codecs.U8.map(
             i -> new BedwarsTeam(i >> 2 & 0b1111, TeamColor.values()[i & 0b0000_11]),

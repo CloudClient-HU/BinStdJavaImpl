@@ -42,12 +42,12 @@ public final class Codecs {
             }
 
             @Override
-            public void encode(DataOutputWrapper out, byte[] value) throws IOException {
-                if (value.length != length) {
-                    throw new MismatchedLengthException(length, value.length);
+            public void encode(DataOutputWrapper out, byte[] array) throws IOException {
+                if (array.length != length) {
+                    throw new MismatchedLengthException(length, array.length);
                 }
 
-                out.writeFixed8Array(value);
+                out.writeFixed8Array(array);
             }
 
         };
@@ -61,8 +61,8 @@ public final class Codecs {
         }
 
         @Override
-        public void encode(DataOutputWrapper out, byte[] value) throws IOException {
-            out.writeDyn8Array(value);
+        public void encode(DataOutputWrapper out, byte[] array) throws IOException {
+            out.writeDyn8Array(array);
         }
 
     };
@@ -76,12 +76,12 @@ public final class Codecs {
             }
 
             @Override
-            public void encode(DataOutputWrapper out, byte[] value) throws IOException {
-                if (value.length > maxLength) {
-                    throw new MismatchedLengthException(0, maxLength, value.length);
+            public void encode(DataOutputWrapper out, byte[] array) throws IOException {
+                if (array.length > maxLength) {
+                    throw new MismatchedLengthException(0, maxLength, array.length);
                 }
 
-                out.writeDyn8Array(value);
+                out.writeDyn8Array(array);
             }
 
         };
@@ -180,12 +180,12 @@ public final class Codecs {
             }
 
             @Override
-            public void encode(DataOutputWrapper out, int[] value) throws IOException {
-                if (value.length != length) {
-                    throw new MismatchedLengthException(length, value.length);
+            public void encode(DataOutputWrapper out, int[] array) throws IOException {
+                if (array.length != length) {
+                    throw new MismatchedLengthException(length, array.length);
                 }
 
-                out.writeFixedVar32Array(value);
+                out.writeFixedVar32Array(array);
             }
 
         };
@@ -199,8 +199,8 @@ public final class Codecs {
         }
 
         @Override
-        public void encode(DataOutputWrapper out, int[] value) throws IOException {
-            out.writeDynVar32Array(value);
+        public void encode(DataOutputWrapper out, int[] array) throws IOException {
+            out.writeDynVar32Array(array);
         }
 
     };
@@ -214,12 +214,12 @@ public final class Codecs {
             }
 
             @Override
-            public void encode(DataOutputWrapper out, int[] value) throws IOException {
-                if (value.length > maxLength) {
-                    throw new MismatchedLengthException(0, maxLength, value.length);
+            public void encode(DataOutputWrapper out, int[] array) throws IOException {
+                if (array.length > maxLength) {
+                    throw new MismatchedLengthException(0, maxLength, array.length);
                 }
 
-                out.writeDynVar32Array(value);
+                out.writeDynVar32Array(array);
             }
 
         };

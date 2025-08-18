@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
+import java.util.UUID;
 
 public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
 
@@ -78,6 +79,11 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
 
     public void writeUTF8(String value) throws IOException {
         writeDyn8Array(value.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public void writeUUID(UUID value) throws IOException {
+        delegate.writeLong(value.getMostSignificantBits());
+        delegate.writeLong(value.getLeastSignificantBits());
     }
 
     public void writeEnum(Enum<?> instance) throws IOException {

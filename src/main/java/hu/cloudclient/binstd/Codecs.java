@@ -1,6 +1,7 @@
 package hu.cloudclient.binstd;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public final class Codecs {
 
@@ -196,6 +197,20 @@ public final class Codecs {
         @Override
         public String decode(DataInputWrapper in) throws IOException {
             return in.readUTF8();
+        }
+
+    };
+
+    public static final Codec<UUID> UUID = new Codec<>() {
+
+        @Override
+        public UUID decode(DataInputWrapper in) throws IOException {
+            return in.readUUID();
+        }
+
+        @Override
+        public void encode(DataOutputWrapper out, UUID value) throws IOException {
+            out.writeUUID(value);
         }
 
     };

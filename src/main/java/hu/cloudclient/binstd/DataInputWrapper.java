@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.IntFunction;
 
 public record DataInputWrapper(DataInput delegate, Config config) implements DataInput {
@@ -115,6 +116,10 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
 
     public String readUTF8(int maxSize) throws IOException {
         return new String(readFixedI8Array(validate(readVar32(), maxSize)), StandardCharsets.UTF_8);
+    }
+
+    public UUID readUUID() throws IOException {
+        return new UUID(delegate.readLong(), delegate.readLong());
     }
 
     public <T extends Enum<T>> T readEnum(Class<T> clazz) throws IOException {

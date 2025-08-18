@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -174,6 +175,18 @@ public class IO {
         validate(Double.MIN_VALUE, codec, 8);
         validate(Double.MAX_VALUE, codec, 8);
         validate(Double.NaN, codec, 8);
+    }
+
+    @Test
+    public void testUTF8() {
+        Codec<String> codec = Codecs.UTF8;
+        validateExactly("abcdefghijklmnopqrstuvwxyz", codec, 26, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7A);
+    }
+
+    @Test
+    public void testUUID() {
+        Codec<UUID> codec = Codecs.UUID;
+        validate(UUID.fromString("fda88f8d-7cae-4f2a-9a50-62f319b35635"), codec, 16);
     }
 
     enum TestEnum {

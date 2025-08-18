@@ -43,6 +43,10 @@ public final class Codecs {
 
             @Override
             public void encode(DataOutputWrapper out, byte[] value) throws IOException {
+                if (value.length != length) {
+                    throw new MismatchedLengthException(length, value.length);
+                }
+
                 out.writeFixed8Array(value);
             }
 
@@ -62,6 +66,26 @@ public final class Codecs {
         }
 
     };
+
+    public static Codec<byte[]> dynI8Array(int maxLength) {
+        return new Codec<>() {
+
+            @Override
+            public byte[] decode(DataInputWrapper in) throws IOException {
+                return in.readDynI8Array(maxLength);
+            }
+
+            @Override
+            public void encode(DataOutputWrapper out, byte[] value) throws IOException {
+                if (value.length > maxLength) {
+                    throw new MismatchedLengthException(0, maxLength, value.length);
+                }
+
+                out.writeDyn8Array(value);
+            }
+
+        };
+    }
 
     public static final Codec<Integer> U8 = new Codec<>() {
 
@@ -157,6 +181,10 @@ public final class Codecs {
 
             @Override
             public void encode(DataOutputWrapper out, int[] value) throws IOException {
+                if (value.length != length) {
+                    throw new MismatchedLengthException(length, value.length);
+                }
+
                 out.writeFixedVar32Array(value);
             }
 
@@ -176,6 +204,26 @@ public final class Codecs {
         }
 
     };
+
+    public static Codec<int[]> dynVar32Array(int maxLength) {
+        return new Codec<>() {
+
+            @Override
+            public int[] decode(DataInputWrapper in) throws IOException {
+                return in.readDynVar32Array(maxLength);
+            }
+
+            @Override
+            public void encode(DataOutputWrapper out, int[] value) throws IOException {
+                if (value.length > maxLength) {
+                    throw new MismatchedLengthException(0, maxLength, value.length);
+                }
+
+                out.writeDynVar32Array(value);
+            }
+
+        };
+    }
 
     public static final Codec<Long> VAR64 = new Codec<>() {
 

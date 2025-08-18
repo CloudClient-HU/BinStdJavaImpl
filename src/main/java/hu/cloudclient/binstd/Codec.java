@@ -57,7 +57,11 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
 
             @Override
             public void encode(DataOutputWrapper out, M value) throws IOException {
-                out.writeDynMap(value, keyCodec, valueCodec);
+                if (value.size() != size) {
+                    throw new MismatchedLengthException(size, value.size());
+                }
+
+                out.writeFixedMap(value, keyCodec, valueCodec);
             }
 
         };
@@ -73,6 +77,25 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
 
             @Override
             public void encode(DataOutputWrapper out, M value) throws IOException {
+                out.writeDynMap(value, keyCodec, valueCodec);
+            }
+
+        };
+    }
+
+    static <K, V, M extends Map<K, V>> Codec<M> dynMap(IntFunction<M> mapFactory, Codec<K> keyCodec, Codec<V> valueCodec, int maxSize) {
+        return new Codec<>() {
+
+            @Override
+            public M decode(DataInputWrapper in) throws IOException {
+                return in.readDynMap(mapFactory, keyCodec, valueCodec, maxSize);
+            }
+
+            @Override
+            public void encode(DataOutputWrapper out, M value) throws IOException {
+                if (value.size() > maxSize) {
+                    throw new MismatchedLengthException(0, maxSize, value.size());
+                }
                 out.writeDynMap(value, keyCodec, valueCodec);
             }
 
@@ -841,6 +864,10 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
 
             @Override
             public void encode(DataOutputWrapper out, T[] value) throws IOException {
+                if (value.length != length) {
+                    throw new MismatchedLengthException(length, value.length);
+                }
+
                 out.writeFixedArray(value, Codec.this);
             }
 
@@ -863,6 +890,26 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
         };
     }
 
+    default Codec<T[]> dynArray(IntFunction<T[]> factory, int maxLength) {
+        return new Codec<>() {
+
+            @Override
+            public T[] decode(DataInputWrapper in) throws IOException {
+                return in.readDynArray(factory, Codec.this, maxLength);
+            }
+
+            @Override
+            public void encode(DataOutputWrapper out, T[] value) throws IOException {
+                if (value.length > maxLength) {
+                    throw new MismatchedLengthException(0, maxLength, value.length);
+                }
+
+                out.writeDynArray(value, Codec.this);
+            }
+
+        };
+    }
+
     default <C extends Collection<T>> Codec<C> fixedCollection(IntFunction<C> factory, int size) {
         return new Codec<>() {
 
@@ -873,6 +920,10 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
 
             @Override
             public void encode(DataOutputWrapper out, C value) throws IOException {
+                if (value.size() != size) {
+                    throw new MismatchedLengthException(size, value.size());
+                }
+
                 out.writeFixedCollection(value, Codec.this);
             }
 
@@ -889,6 +940,26 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
 
             @Override
             public void encode(DataOutputWrapper out, C value) throws IOException {
+                out.writeDynCollection(value, Codec.this);
+            }
+
+        };
+    }
+
+    default <C extends Collection<T>> Codec<C> dynCollection(IntFunction<C> factory, int maxSize) {
+        return new Codec<>() {
+
+            @Override
+            public C decode(DataInputWrapper in) throws IOException {
+                return in.readDynArrayAsCollection(factory, Codec.this, maxSize);
+            }
+
+            @Override
+            public void encode(DataOutputWrapper out, C value) throws IOException {
+                if (value.size() > maxSize) {
+                    throw new MismatchedLengthException(0, maxSize, value.size());
+                }
+
                 out.writeDynCollection(value, Codec.this);
             }
 

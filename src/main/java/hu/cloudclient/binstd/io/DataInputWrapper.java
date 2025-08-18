@@ -1,6 +1,7 @@
-package hu.cloudclient.binstd;
+package hu.cloudclient.binstd.io;
 
 import com.google.common.io.ByteStreams;
+import hu.cloudclient.binstd.exception.MismatchedLengthException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

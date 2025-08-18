@@ -1,4 +1,6 @@
-package hu.cloudclient.binstd;
+package hu.cloudclient.binstd.io;
+
+import hu.cloudclient.binstd.exception.MismatchedLengthException;
 
 import java.io.IOException;
 import java.util.UUID;

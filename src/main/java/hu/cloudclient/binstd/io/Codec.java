@@ -1,5 +1,6 @@
-package hu.cloudclient.binstd;
+package hu.cloudclient.binstd.io;
 
+import hu.cloudclient.binstd.exception.MismatchedLengthException;
 import hu.cloudclient.binstd.function.*;
 import org.jetbrains.annotations.Nullable;
 

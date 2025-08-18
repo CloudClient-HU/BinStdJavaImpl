@@ -1,9 +1,9 @@
 package hu.cloudclient.binstd.test;
 
-import hu.cloudclient.binstd.Codec;
-import hu.cloudclient.binstd.Codecs;
-import hu.cloudclient.binstd.DataInputWrapper;
-import hu.cloudclient.binstd.DataOutputWrapper;
+import hu.cloudclient.binstd.io.Codec;
+import hu.cloudclient.binstd.io.Codecs;
+import hu.cloudclient.binstd.io.DataInputWrapper;
+import hu.cloudclient.binstd.io.DataOutputWrapper;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 import org.junit.jupiter.api.Test;
@@ -243,7 +243,29 @@ public class IO {
         }
 
         try {
+            Codec<int[]> codec = Codecs.fixedVar32Array(5);
+            int[] values = {420, 69, 0, 12, 74};
+            byte[] bytes = DataOutputWrapper.encodeAndGetBytes(values, codec);
+
+            DataInputWrapper in = new DataInputWrapper(bytes);
+            assertArrayEquals(codec.decode(in), values);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
             Codec<byte[]> codec = Codecs.DYN_I8_ARRAY;
+            byte[] values = {42, -69, 0, 12, 74};
+            byte[] bytes = DataOutputWrapper.encodeAndGetBytes(values, codec);
+
+            DataInputWrapper in = new DataInputWrapper(bytes);
+            assertArrayEquals(codec.decode(in), values);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            Codec<byte[]> codec = Codecs.fixedI8Array(5);
             byte[] values = {42, -69, 0, 12, 74};
             byte[] bytes = DataOutputWrapper.encodeAndGetBytes(values, codec);
 

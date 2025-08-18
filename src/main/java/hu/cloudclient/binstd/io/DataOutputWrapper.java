@@ -1,4 +1,4 @@
-package hu.cloudclient.binstd;
+package hu.cloudclient.binstd.io;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;

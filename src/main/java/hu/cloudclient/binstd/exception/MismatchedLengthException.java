@@ -1,4 +1,4 @@
-package hu.cloudclient.binstd;
+package hu.cloudclient.binstd.exception;
 
 import java.io.IOException;
 

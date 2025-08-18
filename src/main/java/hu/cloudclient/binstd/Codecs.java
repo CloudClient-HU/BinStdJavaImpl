@@ -33,7 +33,23 @@ public final class Codecs {
 
     };
 
-    public static final Codec<byte[]> I8_ARRAY = new Codec<>() {
+    public static Codec<byte[]> fixedI8Array(int length) {
+        return new Codec<>() {
+
+            @Override
+            public byte[] decode(DataInputWrapper in) throws IOException {
+                return in.readFixedI8Array(length);
+            }
+
+            @Override
+            public void encode(DataOutputWrapper out, byte[] value) throws IOException {
+                out.writeFixed8Array(value);
+            }
+
+        };
+    }
+
+    public static final Codec<byte[]> DYN_I8_ARRAY = new Codec<>() {
 
         @Override
         public byte[] decode(DataInputWrapper in) throws IOException {
@@ -131,7 +147,23 @@ public final class Codecs {
 
     };
 
-    public static final Codec<int[]> VAR32_ARRAY = new Codec<>() {
+    public static Codec<int[]> fixedVar32Array(int length) {
+        return new Codec<>() {
+
+            @Override
+            public int[] decode(DataInputWrapper in) throws IOException {
+                return in.readFixedVar32Array(length);
+            }
+
+            @Override
+            public void encode(DataOutputWrapper out, int[] value) throws IOException {
+                out.writeFixedVar32Array(value);
+            }
+
+        };
+    }
+
+    public static final Codec<int[]> DYN_VAR32_ARRAY = new Codec<>() {
 
         @Override
         public int[] decode(DataInputWrapper in) throws IOException {

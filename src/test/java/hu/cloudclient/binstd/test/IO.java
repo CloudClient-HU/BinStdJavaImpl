@@ -232,7 +232,7 @@ public class IO {
     @Test
     public void testArrays() {
         try {
-            Codec<int[]> codec = Codecs.VAR32_ARRAY;
+            Codec<int[]> codec = Codecs.DYN_VAR32_ARRAY;
             int[] values = {420, 69, 0, 12, 74};
             byte[] bytes = DataOutputWrapper.encodeAndGetBytes(values, codec);
 
@@ -243,7 +243,7 @@ public class IO {
         }
 
         try {
-            Codec<byte[]> codec = Codecs.I8_ARRAY;
+            Codec<byte[]> codec = Codecs.DYN_I8_ARRAY;
             byte[] values = {42, -69, 0, 12, 74};
             byte[] bytes = DataOutputWrapper.encodeAndGetBytes(values, codec);
 
@@ -254,7 +254,7 @@ public class IO {
         }
 
         try {
-            Codec<Vec3d[]> codec = Vec3d.CODEC.array(Vec3d[]::new);
+            Codec<Vec3d[]> codec = Vec3d.CODEC.dynArray(Vec3d[]::new);
             Vec3d[] values = {new Vec3d(1, 2, 3), new Vec3d(4, 5, 6)};
             byte[] bytes = DataOutputWrapper.encodeAndGetBytes(values, codec);
 
@@ -289,7 +289,7 @@ public class IO {
 
     @Test
     public void mapTest() {
-        Codec<Map<Integer, String>> codec = Codec.map(HashMap::new, Codecs.VAR32, Codecs.UTF8);
+        Codec<Map<Integer, String>> codec = Codec.dynMap(HashMap::new, Codecs.VAR32, Codecs.UTF8);
         Map<Integer, String> playerIDToNameMap = Map.of(0, "Pistike", 7, "Sanyika", 4, "Ferike");
         validate(playerIDToNameMap, codec, 1 + 1 + 1 + 7 + 1 + 1 + 7 + 1 + 1 + 6);
     }

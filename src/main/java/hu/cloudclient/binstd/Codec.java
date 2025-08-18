@@ -47,7 +47,23 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
         };
     }
 
-    static <K, V, M extends Map<K, V>> Codec<M> map(IntFunction<M> mapFactory, Codec<K> keyCodec, Codec<V> valueCodec) {
+    static <K, V, M extends Map<K, V>> Codec<M> fixedMap(IntFunction<M> mapFactory, Codec<K> keyCodec, Codec<V> valueCodec, int size) {
+        return new Codec<>() {
+
+            @Override
+            public M decode(DataInputWrapper in) throws IOException {
+                return in.readFixedMap(mapFactory, keyCodec, valueCodec, size);
+            }
+
+            @Override
+            public void encode(DataOutputWrapper out, M value) throws IOException {
+                out.writeDynMap(value, keyCodec, valueCodec);
+            }
+
+        };
+    }
+
+    static <K, V, M extends Map<K, V>> Codec<M> dynMap(IntFunction<M> mapFactory, Codec<K> keyCodec, Codec<V> valueCodec) {
         return new Codec<>() {
 
             @Override
@@ -815,7 +831,23 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
         };
     }
 
-    default Codec<T[]> array(IntFunction<T[]> factory) {
+    default Codec<T[]> fixedArray(IntFunction<T[]> factory, int length) {
+        return new Codec<>() {
+
+            @Override
+            public T[] decode(DataInputWrapper in) throws IOException {
+                return in.readFixedArray(factory, Codec.this, length);
+            }
+
+            @Override
+            public void encode(DataOutputWrapper out, T[] value) throws IOException {
+                out.writeFixedArray(value, Codec.this);
+            }
+
+        };
+    }
+
+    default Codec<T[]> dynArray(IntFunction<T[]> factory) {
         return new Codec<>() {
 
             @Override
@@ -831,7 +863,23 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
         };
     }
 
-    default <C extends Collection<T>> Codec<C> collection(IntFunction<C> factory) {
+    default <C extends Collection<T>> Codec<C> fixedCollection(IntFunction<C> factory, int size) {
+        return new Codec<>() {
+
+            @Override
+            public C decode(DataInputWrapper in) throws IOException {
+                return in.readFixedArrayAsCollection(factory, Codec.this, size);
+            }
+
+            @Override
+            public void encode(DataOutputWrapper out, C value) throws IOException {
+                out.writeFixedCollection(value, Codec.this);
+            }
+
+        };
+    }
+
+    default <C extends Collection<T>> Codec<C> dynCollection(IntFunction<C> factory) {
         return new Codec<>() {
 
             @Override

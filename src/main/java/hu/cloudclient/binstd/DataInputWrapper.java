@@ -27,9 +27,9 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
         this(ByteStreams.newDataInput(data), Config.DEFAULT);
     }
 
-    private static int validate(int actual, int max) throws OutOfRangeException {
+    private static int validate(int actual, int max) throws MismatchedLengthException {
         if (actual < 0 || actual > max) {
-            throw new OutOfRangeException(0, max, actual);
+            throw new MismatchedLengthException(0, max, actual);
         }
 
         return actual;

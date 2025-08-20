@@ -18,22 +18,22 @@ public class CodecCodegen {
     }
 
     public static String getMethodDef(int n) {
-        return "// This is an automatically generated method, you should probably not modify this\nstatic <CT, " + getRepeated(1, n, ", ", "T%d") +
-            "> Codec<CT> composite("+
+        return "// This is an automatically generated method, you should probably not modify this\nstatic <T, " + getRepeated(1, n, ", ", "F%d") +
+            "> Codec<T> rec("+
             switch (n) {
                 case 1 -> "Function";
                 case 2 -> "BiFunction";
                 default -> "Function" + n;
             } +
             "<" +
-            getRepeated(1, n, ", ", "T%d") +
-            ", CT> factory, " +
-            getRepeated(1, n, ", ", "Codec<T%1$d> c%1$d, Function<CT, T%1$d> g%1$d") +
-            ") {\n    return new Codec<>() {\n\n        @Override\n        public CT decode(DataInputWrapper in) throws IOException {\n            " +
-            getRepeated(1, n, "\n            ", "T%1$d v%1$d = c%1$d.decode(in);") +
+            getRepeated(1, n, ", ", "F%d") +
+            ", T> factory, " +
+            getRepeated(1, n, ", ", "Codec<F%1$d> c%1$d, Function<T, F%1$d> g%1$d") +
+            ") {\n    return new Codec<>() {\n\n        @Override\n        public T decode(DataInputWrapper in) throws IOException {\n            " +
+            getRepeated(1, n, "\n            ", "F%1$d v%1$d = c%1$d.decode(in);") +
             "\n            return factory.apply(" +
             getRepeated(1, n, ", ", "v%1$d") +
-            ");\n        }\n\n        @Override\n        public void encode(DataOutputWrapper out, CT value) throws IOException {\n            " +
+            ");\n        }\n\n        @Override\n        public void encode(DataOutputWrapper out, T value) throws IOException {\n            " +
             getRepeated(1, n, "\n            ", "c%1$d.encode(out, g%1$d.apply(value));") +
             "\n        }\n    };\n}";
     }

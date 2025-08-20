@@ -212,7 +212,7 @@ public class IO {
 
     record Vec3d(double x, double y, double z) {
 
-        public static final Codec<Vec3d> CODEC = Codec.composite(Vec3d::new,
+        public static final Codec<Vec3d> CODEC = Codec.rec(Vec3d::new,
             Codecs.F64, Vec3d::x,
             Codecs.F64, Vec3d::y,
             Codecs.F64, Vec3d::z

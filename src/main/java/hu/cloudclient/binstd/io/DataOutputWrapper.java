@@ -47,24 +47,24 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
 
     public void writeVar32(int value) throws IOException {
         while (true) {
-            if ((value & 0xFFFFFF80) == 0x00) {
+            if ((value & 0xFFFFFF80) == 0) {
                 delegate.writeByte(value);
                 return;
             }
 
-            delegate.writeByte(value & 0x7F | 0x80);
+            delegate.writeByte(value & 0b01111111 | 0b10000000);
             value >>>= 7;
         }
     }
 
     public void writeVar64(long value) throws IOException {
         while (true) {
-            if ((value & 0xFFFFFFFFFFFFFF80L) == 0x00) {
-                delegate.writeByte((int) (value & 0xFF));
+            if ((value & 0xFFFFFFFFFFFFFF80L) == 0) {
+                delegate.writeByte((int) value);
                 return;
             }
 
-            delegate.writeByte((int) ((value & 0x7F | 0x80) & 0xFF));
+            delegate.writeByte((int) ((value & 0b01111111 | 0b10000000)));
             value >>>= 7;
         }
     }
@@ -105,14 +105,18 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
         }
     }
 
-    public <T> void writeFixedCollection(Collection<T> collection, Encoder<T> encoder) throws IOException {
-        for (T t : collection) {
-            encoder.encode(this, t);
-        }
+    public <T> void writeDynArray(T[] array, Encoder<T> encoder) throws IOException {
+        writeVar32(array.length);
+        writeFixedArray(array, encoder);
     }
 
     public void writeFixed8Array(byte[] array) throws IOException {
         delegate.write(array);
+    }
+
+    public void writeDyn8Array(byte[] array) throws IOException {
+        writeVar32(array.length);
+        writeFixed8Array(array);
     }
 
     public void writeFixedVar32Array(int[] array) throws IOException {
@@ -121,27 +125,23 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
         }
     }
 
-    public <T> void writeDynArray(T[] array, Encoder<T> encoder) throws IOException {
-        writeVar32(array.length);
-        writeFixedArray(array, encoder);
-    }
-
-    public <T> void writeDynCollection(Collection<T> collection, Encoder<T> encoder) throws IOException {
-        writeVar32(collection.size());
-        writeFixedCollection(collection, encoder);
-    }
-
-    public void writeDyn8Array(byte[] array) throws IOException {
-        writeVar32(array.length);
-        writeFixed8Array(array);
-    }
-
     public void writeDynVar32Array(int[] array) throws IOException {
         writeVar32(array.length);
 
         for (int i : array) {
             writeVar32(i);
         }
+    }
+
+    public <T> void writeFixedCollection(Collection<T> collection, Encoder<T> encoder) throws IOException {
+        for (T t : collection) {
+            encoder.encode(this, t);
+        }
+    }
+
+    public <T> void writeDynCollection(Collection<T> collection, Encoder<T> encoder) throws IOException {
+        writeVar32(collection.size());
+        writeFixedCollection(collection, encoder);
     }
 
     public <K, V> void writeFixedMap(Map<K, V> map, Encoder<K> keyEncoder, Encoder<V> valueEncoder) throws IOException {

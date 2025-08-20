@@ -67,10 +67,10 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
     public int readVar32() throws IOException {
         int value = 0;
         int pos = 0;
-        while (true) {
+        for (;;) {
             byte b = delegate.readByte();
-            value |= (b & 0x7F) << pos;
-            if ((b & 0x80) != 0x80) {
+            value |= (b & 0b01111111) << pos;
+            if ((b & 0b10000000) != 0b10000000) {
                 break;
             }
 
@@ -86,11 +86,11 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
     public long readVar64() throws IOException {
         long value = 0;
         int pos = 0;
-        while (true) {
+        for (;;) {
             byte b = delegate.readByte();
-            value |= (b & 0x7FL) << pos;
+            value |= (b & 0b01111111L) << pos;
 
-            if ((b & 0x80) != 0x80) {
+            if ((b & 0b10000000) != 0b10000000) {
                 break;
             }
 
@@ -159,39 +159,13 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
         }
     }
 
-    public <T> T[] readFixedArray(IntFunction<T[]> factory, Decoder<T> decoder, int length) throws IOException {
-        T[] array = factory.apply(length);
+    public <T> T[] readFixedArray(IntFunction<T[]> arrayFactory, Decoder<T> decoder, int length) throws IOException {
+        T[] array = arrayFactory.apply(length);
         for (int i = 0; i < length; i++) {
             array[i] = decoder.decode(this);
         }
 
         return array;
-    }
-
-    public <T, C extends Collection<T>> C readFixedArrayAsCollection(IntFunction<C> collectionFactory, Decoder<T> decoder, int size) throws IOException {
-        C collection = collectionFactory.apply(size);
-
-        for (int i = 0; i < size; i++) {
-            collection.add(decoder.decode(this));
-        }
-
-        return collection;
-    }
-
-    public byte[] readFixedI8Array(int length) throws IOException {
-        byte[] bytes = new byte[length];
-        delegate.readFully(bytes);
-        return bytes;
-    }
-
-    public int[] readFixedVar32Array(int length) throws IOException {
-        int[] ints = new int[length];
-
-        for (int i = 0; i < length; i++) {
-            ints[i] = readVar32();
-        }
-
-        return ints;
     }
 
     public <T> T[] readDynArray(IntFunction<T[]> factory, Decoder<T> decoder) throws IOException {
@@ -203,11 +177,27 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
     }
 
     public <T, C extends Collection<T>> C readDynArrayAsCollection(IntFunction<C> collectionFactory, Decoder<T> decoder) throws IOException {
-        return readFixedArrayAsCollection(collectionFactory, decoder, validate(readVar32(), config.maxArrayLength));
+        return readFixedCollection(collectionFactory, decoder, validate(readVar32(), config.maxArrayLength));
+    }
+
+    public <T, C extends Collection<T>> C readFixedCollection(IntFunction<C> collectionFactory, Decoder<T> decoder, int size) throws IOException {
+        C collection = collectionFactory.apply(size);
+
+        for (int i = 0; i < size; i++) {
+            collection.add(decoder.decode(this));
+        }
+
+        return collection;
     }
 
     public <T, C extends Collection<T>> C readDynArrayAsCollection(IntFunction<C> collectionFactory, Decoder<T> decoder, int maxSize) throws IOException {
-        return readFixedArrayAsCollection(collectionFactory, decoder, validate(readVar32(), maxSize));
+        return readFixedCollection(collectionFactory, decoder, validate(readVar32(), maxSize));
+    }
+
+    public byte[] readFixedI8Array(int length) throws IOException {
+        byte[] bytes = new byte[length];
+        delegate.readFully(bytes);
+        return bytes;
     }
 
     public byte[] readDynI8Array() throws IOException {
@@ -216,6 +206,16 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
 
     public byte[] readDynI8Array(int maxLength) throws IOException {
         return readFixedI8Array(validate(readVar32(), maxLength));
+    }
+
+    public int[] readFixedVar32Array(int length) throws IOException {
+        int[] ints = new int[length];
+
+        for (int i = 0; i < length; i++) {
+            ints[i] = readVar32();
+        }
+
+        return ints;
     }
 
     public int[] readDynVar32Array() throws IOException {

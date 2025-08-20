@@ -916,7 +916,7 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
 
             @Override
             public C decode(DataInputWrapper in) throws IOException {
-                return in.readFixedArrayAsCollection(collectionFactory, Codec.this, expectedSize);
+                return in.readFixedCollection(collectionFactory, Codec.this, expectedSize);
             }
 
             @Override

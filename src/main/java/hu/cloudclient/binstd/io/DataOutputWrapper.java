@@ -46,8 +46,8 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
     }
 
     public void writeVar32(int value) throws IOException {
-        while (true) {
-            if ((value & 0xFFFFFF80) == 0) {
+        for (;;) {
+            if ((value & ~0b01111111) == 0) {
                 delegate.writeByte(value);
                 return;
             }
@@ -58,13 +58,13 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
     }
 
     public void writeVar64(long value) throws IOException {
-        while (true) {
-            if ((value & 0xFFFFFFFFFFFFFF80L) == 0) {
+        for (;;) {
+            if ((value & ~0b01111111L) == 0) {
                 delegate.writeByte((int) value);
                 return;
             }
 
-            delegate.writeByte((int) ((value & 0b01111111 | 0b10000000)));
+            delegate.writeByte((int) (value & 0b01111111 | 0b10000000));
             value >>>= 7;
         }
     }

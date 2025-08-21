@@ -65,42 +65,34 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
     }
 
     public int readVar32() throws IOException {
-        int value = 0;
-        int pos = 0;
-        for (;;) {
+        for (int value = 0, pos = 0;; pos += 7) {
             byte b = delegate.readByte();
             value |= (b & 0b01111111) << pos;
-            if ((b & 0b10000000) != 0b10000000) {
-                break;
+
+            if ((b & 0b10000000) == 0) {
+                return value;
             }
 
-            pos += 7;
-
-            if (pos > 32) {
+            if (pos > (32 - 7)) {
                 throw new IOException("var32 too big");
             }
         }
-        return value;
     }
 
     public long readVar64() throws IOException {
         long value = 0;
-        int pos = 0;
-        for (;;) {
+        for (int pos = 0;; pos += 7) {
             byte b = delegate.readByte();
             value |= (b & 0b01111111L) << pos;
 
-            if ((b & 0b10000000) != 0b10000000) {
-                break;
+            if ((b & 0b10000000) == 0) {
+                return value;
             }
 
-            pos += 7;
-
-            if (pos > 64) {
+            if (pos > 64 - 7) {
                 throw new IOException("var64 too big");
             }
         }
-        return value;
     }
 
     public float readF32() throws IOException {

@@ -8,13 +8,19 @@ import org.jetbrains.annotations.Nullable;
 import java.io.DataInput;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.IntFunction;
 
-public record DataInputWrapper(DataInput delegate, Config config) implements DataInput {
+@SuppressWarnings("DeprecatedIsStillUsed")
+public class DataInputWrapper implements DataInput {
+
+    private final DataInput delegate;
+    private final Config config;
+
+    public DataInputWrapper(DataInput delegate, Config config) {
+        this.delegate = delegate;
+        this.config = config;
+    }
 
     public DataInputWrapper(DataInput delegate) {
         this(delegate, Config.DEFAULT);
@@ -37,36 +43,36 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
     }
 
     public boolean readBool() throws IOException {
-        return delegate.readBoolean();
+        return readBoolean();
     }
 
     public byte readI8() throws IOException {
-        return delegate.readByte();
+        return readByte();
     }
 
     public int readU8() throws IOException {
-        return delegate.readUnsignedByte();
+        return readUnsignedByte();
     }
 
     public short readI16() throws IOException {
-        return delegate.readShort();
+        return readShort();
     }
 
     public int readU16() throws IOException {
-        return delegate.readUnsignedShort();
+        return readUnsignedShort();
     }
 
     public int readI32() throws IOException {
-        return delegate.readInt();
+        return readInt();
     }
 
     public long readI64() throws IOException {
-        return delegate.readLong();
+        return readLong();
     }
 
     public int readVar32() throws IOException {
         for (int value = 0, pos = 0;; pos += 7) {
-            byte b = delegate.readByte();
+            byte b = readByte();
             value |= (b & 0b01111111) << pos;
 
             if ((b & 0b10000000) == 0) {
@@ -82,7 +88,7 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
     public long readVar64() throws IOException {
         long value = 0;
         for (int pos = 0;; pos += 7) {
-            byte b = delegate.readByte();
+            byte b = readByte();
             value |= (b & 0b01111111L) << pos;
 
             if ((b & 0b10000000) == 0) {
@@ -96,11 +102,11 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
     }
 
     public float readF32() throws IOException {
-        return delegate.readFloat();
+        return readFloat();
     }
 
     public double readF64() throws IOException {
-        return delegate.readDouble();
+        return readDouble();
     }
 
     public String readUTF8() throws IOException {
@@ -112,7 +118,7 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
     }
 
     public UUID readUUID() throws IOException {
-        return new UUID(delegate.readLong(), delegate.readLong());
+        return new UUID(readLong(), readLong());
     }
 
     public <T extends Enum<T>> T readEnum(Class<T> clazz) throws IOException {
@@ -132,7 +138,7 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
 
     @Nullable
     public <T> T readNullable(Decoder<T> decoder) throws IOException {
-        boolean isPresent = delegate.readBoolean();
+        boolean isPresent = readBoolean();
 
         if (isPresent) {
             return decoder.decode(this);
@@ -142,7 +148,7 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
     }
 
     public <T> Optional<T> readOptional(Decoder<T> decoder) throws IOException {
-        boolean isPresent = delegate.readBoolean();
+        boolean isPresent = readBoolean();
 
         if (isPresent) {
             return Optional.of(decoder.decode(this));
@@ -188,7 +194,7 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
 
     public byte[] readFixedI8Array(int length) throws IOException {
         byte[] bytes = new byte[length];
-        delegate.readFully(bytes);
+        readFully(bytes);
         return bytes;
     }
 

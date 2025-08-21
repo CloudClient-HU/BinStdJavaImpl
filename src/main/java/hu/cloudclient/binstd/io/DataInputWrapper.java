@@ -73,7 +73,7 @@ public record DataInputWrapper(DataInput delegate, Config config) implements Dat
                 return value;
             }
 
-            if (pos > (32 - 7)) {
+            if (pos > 32 - 7) {
                 throw new IOException("var32 too big");
             }
         }

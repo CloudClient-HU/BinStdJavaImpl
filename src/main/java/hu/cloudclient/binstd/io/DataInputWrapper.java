@@ -8,14 +8,18 @@ import org.jetbrains.annotations.Nullable;
 import java.io.DataInput;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.IntFunction;
 
 @SuppressWarnings("DeprecatedIsStillUsed")
-public class DataInputWrapper implements DataInput {
+public final class DataInputWrapper implements DataInput {
 
     private final DataInput delegate;
     private final Config config;
+    private int bytesRead = 0;
 
     public DataInputWrapper(DataInput delegate, Config config) {
         this.delegate = delegate;
@@ -32,6 +36,10 @@ public class DataInputWrapper implements DataInput {
 
     public DataInputWrapper(byte[] data) {
         this(ByteStreams.newDataInput(data), Config.DEFAULT);
+    }
+
+    public int bytesRead() {
+        return bytesRead;
     }
 
     private static int validate(int actual, int max) throws MismatchedLengthException {
@@ -251,78 +259,91 @@ public class DataInputWrapper implements DataInput {
     @Deprecated
     @Override
     public void readFully(byte @NotNull [] b) throws IOException {
+        bytesRead += b.length;
         delegate.readFully(b);
     }
 
     @Deprecated
     @Override
     public void readFully(byte @NotNull [] b, int off, int len) throws IOException {
+        bytesRead += len;
         delegate.readFully(b, off, len);
     }
 
     @Deprecated
     @Override
     public int skipBytes(int n) throws IOException {
+        bytesRead += n;
         return delegate.skipBytes(n);
     }
 
     @Deprecated
     @Override
     public boolean readBoolean() throws IOException {
+        bytesRead += 1;
         return delegate.readBoolean();
     }
 
     @Deprecated
     @Override
     public byte readByte() throws IOException {
+        bytesRead += 1;
         return delegate.readByte();
     }
 
     @Deprecated
     @Override
     public int readUnsignedByte() throws IOException {
+        bytesRead += 1;
         return delegate.readUnsignedByte();
     }
 
     @Deprecated
     @Override
     public short readShort() throws IOException {
+        bytesRead += 2;
         return delegate.readShort();
     }
 
     @Deprecated
     @Override
     public int readUnsignedShort() throws IOException {
+        bytesRead += 2;
         return delegate.readUnsignedShort();
     }
 
     @Deprecated
     @Override
     public char readChar() throws IOException {
+        bytesRead += 2;
         return delegate.readChar();
     }
 
     @Deprecated
     @Override
     public int readInt() throws IOException {
+        bytesRead += 4;
         return delegate.readInt();
     }
 
     @Deprecated
     @Override
     public long readLong() throws IOException {
+        bytesRead += 8;
         return delegate.readLong();
     }
 
     @Deprecated
     @Override
     public float readFloat() throws IOException {
+        bytesRead += 4;
         return delegate.readFloat();
     }
 
     @Deprecated
     @Override
     public double readDouble() throws IOException {
+        bytesRead += 8;
         return delegate.readDouble();
     }
 
@@ -330,14 +351,14 @@ public class DataInputWrapper implements DataInput {
     @Deprecated
     @Override
     public String readLine() throws IOException {
-        return delegate.readLine();
+        throw new IOException("deprecated");
     }
 
     @NotNull
     @Deprecated
     @Override
     public String readUTF() throws IOException {
-        return delegate.readUTF();
+        throw new IOException("deprecated");
     }
 
     public record Config(int maxUTF8Size, int maxArrayLength, int maxMapSize) {

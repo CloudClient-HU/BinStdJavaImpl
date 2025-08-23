@@ -31,21 +31,7 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
     }
 
     static <T> Codec<T> ofInstance(T instance) {
-        return new Codec<>() {
-
-            @Override
-            public T decode(DataInputWrapper in) throws IOException {
-                return instance;
-            }
-
-            @Override
-            public void encode(DataOutputWrapper out, T value) throws IOException {
-                if (value != instance) {
-                    throw new IOException("value != instance");
-                }
-            }
-
-        };
+        return new InstanceCodec<>(instance);
     }
 
     static <K, V, M extends Map<K, V>> Codec<M> fixedMap(IntFunction<M> mapFactory, Codec<K> keyCodec, Codec<V> valueCodec, int size) {

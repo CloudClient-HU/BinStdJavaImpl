@@ -34,7 +34,7 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
         return new InstanceCodec<>(instance);
     }
 
-    static <K, V, M extends Map<K, V>> Codec<M> fixedMap(IntFunction<M> mapFactory, Codec<K> keyCodec, Codec<V> valueCodec, int size) {
+    static <K, V, M extends Map<K, V>> Codec<Map<K, V>> fixedMap(IntFunction<M> mapFactory, Codec<K> keyCodec, Codec<V> valueCodec, int size) {
         return new Codec<>() {
 
             @Override
@@ -43,7 +43,7 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
             }
 
             @Override
-            public void encode(DataOutputWrapper out, M map) throws IOException {
+            public void encode(DataOutputWrapper out, Map<K, V> map) throws IOException {
                 if (map.size() != size) {
                     throw new MismatchedLengthException(size, map.size());
                 }
@@ -54,7 +54,7 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
         };
     }
 
-    static <K, V, M extends Map<K, V>> Codec<M> dynMap(IntFunction<M> mapFactory, Codec<K> keyCodec, Codec<V> valueCodec) {
+    static <K, V, M extends Map<K, V>> Codec<Map<K, V>> dynMap(IntFunction<M> mapFactory, Codec<K> keyCodec, Codec<V> valueCodec) {
         return new Codec<>() {
 
             @Override
@@ -63,14 +63,14 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
             }
 
             @Override
-            public void encode(DataOutputWrapper out, M map) throws IOException {
+            public void encode(DataOutputWrapper out, Map<K, V> map) throws IOException {
                 out.writeDynMap(map, keyCodec, valueCodec);
             }
 
         };
     }
 
-    static <K, V, M extends Map<K, V>> Codec<M> dynMap(IntFunction<M> mapFactory, Codec<K> keyCodec, Codec<V> valueCodec, int maxSize) {
+    static <K, V, M extends Map<K, V>> Codec<Map<K, V>> dynMap(IntFunction<M> mapFactory, Codec<K> keyCodec, Codec<V> valueCodec, int maxSize) {
         return new Codec<>() {
 
             @Override
@@ -79,7 +79,7 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
             }
 
             @Override
-            public void encode(DataOutputWrapper out, M map) throws IOException {
+            public void encode(DataOutputWrapper out, Map<K, V> map) throws IOException {
                 if (map.size() > maxSize) {
                     throw new MismatchedLengthException(0, maxSize, map.size());
                 }
@@ -904,7 +904,7 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
         };
     }
 
-    default <C extends Collection<T>> Codec<C> fixedCollection(IntFunction<C> collectionFactory, int expectedSize) {
+    default <C extends Collection<T>> Codec<Collection<T>> fixedCollection(IntFunction<C> collectionFactory, int expectedSize) {
         return new Codec<>() {
 
             @Override
@@ -913,7 +913,7 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
             }
 
             @Override
-            public void encode(DataOutputWrapper out, C collection) throws IOException {
+            public void encode(DataOutputWrapper out, Collection<T> collection) throws IOException {
                 if (collection.size() != expectedSize) {
                     throw new MismatchedLengthException(expectedSize, collection.size());
                 }
@@ -924,7 +924,7 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
         };
     }
 
-    default <C extends Collection<T>> Codec<C> dynCollection(IntFunction<C> collectionFactory) {
+    default <C extends Collection<T>> Codec<Collection<T>> dynCollection(IntFunction<C> collectionFactory) {
         return new Codec<>() {
 
             @Override
@@ -933,14 +933,14 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
             }
 
             @Override
-            public void encode(DataOutputWrapper out, C collection) throws IOException {
+            public void encode(DataOutputWrapper out, Collection<T> collection) throws IOException {
                 out.writeDynCollection(collection, Codec.this);
             }
 
         };
     }
 
-    default <C extends Collection<T>> Codec<C> dynCollection(IntFunction<C> collectionFactory, int maxSize) {
+    default <C extends Collection<T>> Codec<Collection<T>> dynCollection(IntFunction<C> collectionFactory, int maxSize) {
         return new Codec<>() {
 
             @Override
@@ -949,7 +949,7 @@ public interface Codec<T> extends Encoder<T>, Decoder<T> {
             }
 
             @Override
-            public void encode(DataOutputWrapper out, C collection) throws IOException {
+            public void encode(DataOutputWrapper out, Collection<T> collection) throws IOException {
                 if (collection.size() > maxSize) {
                     throw new MismatchedLengthException(0, maxSize, collection.size());
                 }

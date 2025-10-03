@@ -4,6 +4,6 @@ import java.io.IOException;
 
 public interface Decoder<T> {
 
-    T decode(DataInputWrapper in) throws IOException;
+	T decode(DataInputWrapper in) throws IOException;
 
 }

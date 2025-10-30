@@ -78,6 +78,16 @@ public final class DataInputWrapper implements DataInput {
 		return readLong();
 	}
 
+	public short readVar16() throws IOException {
+		int value = readVar32();
+
+		if (value < 0 || value > 65535) {
+			throw new IOException("var16 too big");
+		}
+
+		return (short) value;
+	}
+
 	public int readVar32() throws IOException {
 		for (int value = 0, pos = 0;; pos += 7) {
 			byte b = readByte();

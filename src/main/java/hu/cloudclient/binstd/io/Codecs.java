@@ -159,6 +159,20 @@ public final class Codecs {
 
 	};
 
+	public static final Codec<Short> VAR16 = new Codec<>() {
+
+		@Override
+		public void encode(DataOutputWrapper out, Short value) throws IOException {
+			out.writeVar16(value);
+		}
+
+		@Override
+		public Short decode(DataInputWrapper in) throws IOException {
+			return in.readVar16();
+		}
+
+	};
+
 	public static final Codec<Integer> VAR32 = new Codec<>() {
 
 		@Override

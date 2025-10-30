@@ -45,6 +45,10 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
 		delegate.writeLong(value);
 	}
 
+	public void writeVar16(short value) throws IOException {
+		writeVar32(Short.toUnsignedInt(value));
+	}
+
 	public void writeVar32(int value) throws IOException {
 		for (;;) {
 			if ((value & ~0b01111111) == 0) {

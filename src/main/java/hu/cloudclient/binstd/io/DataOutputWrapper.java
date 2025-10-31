@@ -45,10 +45,6 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
 		delegate.writeLong(value);
 	}
 
-	public void writeVar16(short value) throws IOException {
-		writeVar32(Short.toUnsignedInt(value));
-	}
-
 	public void writeVar32(int value) throws IOException {
 		for (;;) {
 			if ((value & ~0b01111111) == 0) {
@@ -123,6 +119,20 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
 		writeFixed8Array(array);
 	}
 
+	public void writeFixed32Array(int[] array) throws IOException {
+		for (int i : array) {
+			write32(i);
+		}
+	}
+
+	public void writeDyn32Array(int[] array) throws IOException {
+		writeVar32(array.length);
+
+		for (int i : array) {
+			write32(i);
+		}
+	}
+
 	public void writeFixedVar32Array(int[] array) throws IOException {
 		for (int i : array) {
 			writeVar32(i);
@@ -134,6 +144,34 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
 
 		for (int i : array) {
 			writeVar32(i);
+		}
+	}
+
+	public void writeFixed64Array(long[] array) throws IOException {
+		for (long l : array) {
+			write64(l);
+		}
+	}
+
+	public void writeDyn64Array(long[] array) throws IOException {
+		writeVar32(array.length);
+
+		for (long l : array) {
+			write64(l);
+		}
+	}
+
+	public void writeFixedVar64Array(long[] array) throws IOException {
+		for (long l : array) {
+			writeVar64(l);
+		}
+	}
+
+	public void writeDynVar64Array(long[] array) throws IOException {
+		writeVar32(array.length);
+
+		for (long l : array) {
+			writeVar64(l);
 		}
 	}
 

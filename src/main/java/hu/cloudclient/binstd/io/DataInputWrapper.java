@@ -78,16 +78,6 @@ public final class DataInputWrapper implements DataInput {
 		return readLong();
 	}
 
-	public short readVar16() throws IOException {
-		int value = readVar32();
-
-		if (value < 0 || value > 65535) {
-			throw new IOException("var16 too big");
-		}
-
-		return (short) value;
-	}
-
 	public int readVar32() throws IOException {
 		for (int value = 0, pos = 0;; pos += 7) {
 			byte b = readByte();
@@ -224,6 +214,24 @@ public final class DataInputWrapper implements DataInput {
 		return readFixedI8Array(validate(readVar32(), maxLength));
 	}
 
+	public int[] readFixedI32Array(int length) throws IOException {
+		int[] ints = new int[length];
+
+		for (int i = 0; i < length; i++) {
+			ints[i] = readI32();
+		}
+
+		return ints;
+	}
+
+	public int[] readDynI32Array() throws IOException {
+		return readFixedI32Array(validate(readVar32(), config.maxArrayLength));
+	}
+
+	public int[] readDynI32Array(int maxLength) throws IOException {
+		return readFixedI32Array(validate(readVar32(), maxLength));
+	}
+
 	public int[] readFixedVar32Array(int length) throws IOException {
 		int[] ints = new int[length];
 
@@ -240,6 +248,42 @@ public final class DataInputWrapper implements DataInput {
 
 	public int[] readDynVar32Array(int maxLength) throws IOException {
 		return readFixedVar32Array(validate(readVar32(), maxLength));
+	}
+
+	public long[] readFixedI64Array(int length) throws IOException {
+		long[] longs = new long[length];
+
+		for (int i = 0; i < length; i++) {
+			longs[i] = readI64();
+		}
+
+		return longs;
+	}
+
+	public long[] readDynI64Array() throws IOException {
+		return readFixedI64Array(validate(readVar32(), config.maxArrayLength));
+	}
+
+	public long[] readDynI64Array(int maxLength) throws IOException {
+		return readFixedI64Array(validate(readVar32(), maxLength));
+	}
+
+	public long[] readFixedVar64Array(int length) throws IOException {
+		long[] longs = new long[length];
+
+		for (int i = 0; i < length; i++) {
+			longs[i] = readVar64();
+		}
+
+		return longs;
+	}
+
+	public long[] readDynVar64Array() throws IOException {
+		return readFixedVar64Array(validate(readVar32(), config.maxArrayLength));
+	}
+
+	public long[] readDynVar64Array(int maxLength) throws IOException {
+		return readFixedVar64Array(validate(readVar32(), maxLength));
 	}
 
 	public <K, V, M extends Map<K, V>> M readFixedMap(IntFunction<M> mapFactory, Decoder<K> keyDecoder, Decoder<V> valueDecoder, int size) throws IOException {

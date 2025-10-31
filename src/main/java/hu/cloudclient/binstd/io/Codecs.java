@@ -145,6 +145,60 @@ public final class Codecs {
 
 	};
 
+	public static Codec<int[]> fixedI32Array(int length) {
+		return new Codec<>() {
+
+			@Override
+			public int[] decode(DataInputWrapper in) throws IOException {
+				return in.readFixedI32Array(length);
+			}
+
+			@Override
+			public void encode(DataOutputWrapper out, int[] array) throws IOException {
+				if (array.length != length) {
+					throw new MismatchedLengthException(length, array.length);
+				}
+
+				out.writeFixed32Array(array);
+			}
+
+		};
+	}
+
+	public static final Codec<int[]> DYN_I32_ARRAY = new Codec<>() {
+
+		@Override
+		public int[] decode(DataInputWrapper in) throws IOException {
+			return in.readDynI32Array();
+		}
+
+		@Override
+		public void encode(DataOutputWrapper out, int[] array) throws IOException {
+			out.writeDyn32Array(array);
+		}
+
+	};
+
+	public static Codec<int[]> dynI32Array(int maxLength) {
+		return new Codec<>() {
+
+			@Override
+			public int[] decode(DataInputWrapper in) throws IOException {
+				return in.readDynI32Array(maxLength);
+			}
+
+			@Override
+			public void encode(DataOutputWrapper out, int[] array) throws IOException {
+				if (array.length > maxLength) {
+					throw new MismatchedLengthException(0, maxLength, array.length);
+				}
+
+				out.writeDyn32Array(array);
+			}
+
+		};
+	}
+
 	public static final Codec<Long> I64 = new Codec<>() {
 
 		@Override
@@ -159,19 +213,59 @@ public final class Codecs {
 
 	};
 
-	public static final Codec<Short> VAR16 = new Codec<>() {
+	public static Codec<long[]> fixedI64Array(int length) {
+		return new Codec<>() {
+
+			@Override
+			public long[] decode(DataInputWrapper in) throws IOException {
+				return in.readFixedI64Array(length);
+			}
+
+			@Override
+			public void encode(DataOutputWrapper out, long[] array) throws IOException {
+				if (array.length != length) {
+					throw new MismatchedLengthException(length, array.length);
+				}
+
+				out.writeFixed64Array(array);
+			}
+
+		};
+	}
+
+	public static final Codec<long[]> DYN_I64_ARRAY = new Codec<>() {
 
 		@Override
-		public void encode(DataOutputWrapper out, Short value) throws IOException {
-			out.writeVar16(value);
+		public long[] decode(DataInputWrapper in) throws IOException {
+			return in.readDynI64Array();
 		}
 
 		@Override
-		public Short decode(DataInputWrapper in) throws IOException {
-			return in.readVar16();
+		public void encode(DataOutputWrapper out, long[] array) throws IOException {
+			out.writeDyn64Array(array);
 		}
 
 	};
+
+	public static Codec<long[]> dynI64Array(int maxLength) {
+		return new Codec<>() {
+
+			@Override
+			public long[] decode(DataInputWrapper in) throws IOException {
+				return in.readDynI64Array(maxLength);
+			}
+
+			@Override
+			public void encode(DataOutputWrapper out, long[] array) throws IOException {
+				if (array.length > maxLength) {
+					throw new MismatchedLengthException(0, maxLength, array.length);
+				}
+
+				out.writeDyn64Array(array);
+			}
+
+		};
+	}
 
 	public static final Codec<Integer> VAR32 = new Codec<>() {
 
@@ -254,6 +348,60 @@ public final class Codecs {
 		}
 
 	};
+
+	public static Codec<long[]> fixedVar64Array(int length) {
+		return new Codec<>() {
+
+			@Override
+			public long[] decode(DataInputWrapper in) throws IOException {
+				return in.readFixedVar64Array(length);
+			}
+
+			@Override
+			public void encode(DataOutputWrapper out, long[] array) throws IOException {
+				if (array.length != length) {
+					throw new MismatchedLengthException(length, array.length);
+				}
+
+				out.writeFixedVar64Array(array);
+			}
+
+		};
+	}
+
+	public static final Codec<long[]> DYN_VAR64_ARRAY = new Codec<>() {
+
+		@Override
+		public long[] decode(DataInputWrapper in) throws IOException {
+			return in.readDynVar64Array();
+		}
+
+		@Override
+		public void encode(DataOutputWrapper out, long[] array) throws IOException {
+			out.writeDynVar64Array(array);
+		}
+
+	};
+
+	public static Codec<long[]> dynVar64Array(int maxLength) {
+		return new Codec<>() {
+
+			@Override
+			public long[] decode(DataInputWrapper in) throws IOException {
+				return in.readDynVar64Array(maxLength);
+			}
+
+			@Override
+			public void encode(DataOutputWrapper out, long[] array) throws IOException {
+				if (array.length > maxLength) {
+					throw new MismatchedLengthException(0, maxLength, array.length);
+				}
+
+				out.writeDynVar64Array(array);
+			}
+
+		};
+	}
 
 	public static final Codec<Float> F32 = new Codec<>() {
 

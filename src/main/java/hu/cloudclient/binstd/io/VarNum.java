@@ -2,18 +2,6 @@ package hu.cloudclient.binstd.io;
 
 public class VarNum {
 
-	public static int sizeOf(short s) {
-		if (s < 0) {
-			return 3;
-		} else if (s < (1 << (7))) {
-			return 1;
-		} else if (s < (1 << (7 * 2))) {
-			return 2;
-		} else {
-			return 3;
-		}
-	}
-
 	public static int sizeOf(int i) {
 		if (i < 0) {
 			return 5;

@@ -29,19 +29,19 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
 		delegate.writeBoolean(value);
 	}
 
-	public void write8(int value) throws IOException {
+	public void writeI8(int value) throws IOException {
 		delegate.writeByte(value);
 	}
 
-	public void write16(int value) throws IOException {
+	public void writeI16(int value) throws IOException {
 		delegate.writeShort(value);
 	}
 
-	public void write32(int value) throws IOException {
+	public void writeI32(int value) throws IOException {
 		delegate.writeInt(value);
 	}
 
-	public void write64(long value) throws IOException {
+	public void writeI64(long value) throws IOException {
 		delegate.writeLong(value);
 	}
 
@@ -78,7 +78,7 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
 	}
 
 	public void writeUTF8(String value) throws IOException {
-		writeDyn8Array(value.getBytes(StandardCharsets.UTF_8));
+		writeDynI8Array(value.getBytes(StandardCharsets.UTF_8));
 	}
 
 	public void writeUUID(UUID value) throws IOException {
@@ -110,26 +110,26 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
 		writeFixedArray(array, encoder);
 	}
 
-	public void writeFixed8Array(byte[] array) throws IOException {
+	public void writeFixedI8Array(byte[] array) throws IOException {
 		delegate.write(array);
 	}
 
-	public void writeDyn8Array(byte[] array) throws IOException {
+	public void writeDynI8Array(byte[] array) throws IOException {
 		writeVar32(array.length);
-		writeFixed8Array(array);
+		writeFixedI8Array(array);
 	}
 
-	public void writeFixed32Array(int[] array) throws IOException {
+	public void writeFixedI32Array(int[] array) throws IOException {
 		for (int i : array) {
-			write32(i);
+			writeI32(i);
 		}
 	}
 
-	public void writeDyn32Array(int[] array) throws IOException {
+	public void writeDynI32Array(int[] array) throws IOException {
 		writeVar32(array.length);
 
 		for (int i : array) {
-			write32(i);
+			writeI32(i);
 		}
 	}
 
@@ -147,17 +147,17 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
 		}
 	}
 
-	public void writeFixed64Array(long[] array) throws IOException {
+	public void writeFixedI64Array(long[] array) throws IOException {
 		for (long l : array) {
-			write64(l);
+			writeI64(l);
 		}
 	}
 
-	public void writeDyn64Array(long[] array) throws IOException {
+	public void writeDynI64Array(long[] array) throws IOException {
 		writeVar32(array.length);
 
 		for (long l : array) {
-			write64(l);
+			writeI64(l);
 		}
 	}
 

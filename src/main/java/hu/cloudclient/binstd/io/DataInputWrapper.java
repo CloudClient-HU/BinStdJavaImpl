@@ -405,14 +405,14 @@ public final class DataInputWrapper implements DataInput {
 	@Deprecated
 	@Override
 	public String readLine() throws IOException {
-		throw new IOException("deprecated");
+		return delegate.readLine();
 	}
 
 	@NotNull
 	@Deprecated
 	@Override
 	public String readUTF() throws IOException {
-		throw new IOException("deprecated");
+		return delegate.readUTF();
 	}
 
 	public record Config(int maxUTF8Size, int maxArrayLength, int maxMapSize) {

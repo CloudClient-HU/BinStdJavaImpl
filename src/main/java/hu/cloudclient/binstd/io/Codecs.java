@@ -1,9 +1,12 @@
 package hu.cloudclient.binstd.io;
 
+import hu.cloudclient.binstd.IntIdentifiable;
 import hu.cloudclient.binstd.exception.MismatchedLengthException;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.function.IntFunction;
+import java.util.function.ToIntFunction;
 
 public final class Codecs {
 
@@ -470,6 +473,54 @@ public final class Codecs {
 			@Override
 			public void encode(DataOutputWrapper out, T value) throws IOException {
 				out.writeEnum(value);
+			}
+
+		};
+	}
+
+	public static <T> Codec<T> createIntIdentifiable(IntFunction<T> valueGetter, ToIntFunction<T> idGetter) {
+		return new Codec<>() {
+
+			@Override
+			public T decode(DataInputWrapper in) throws IOException {
+				return in.readId(valueGetter);
+			}
+
+			@Override
+			public void encode(DataOutputWrapper out, T value) throws IOException {
+				out.writeId(value, idGetter);
+			}
+
+		};
+	}
+
+	public static <T> Codec<T> createIntIdentifiable(T[] constants, ToIntFunction<T> idGetter) {
+		return new Codec<>() {
+
+			@Override
+			public T decode(DataInputWrapper in) throws IOException {
+				return in.readId(constants);
+			}
+
+			@Override
+			public void encode(DataOutputWrapper out, T value) throws IOException {
+				out.writeId(value, idGetter);
+			}
+
+		};
+	}
+
+	public static <T extends IntIdentifiable> Codec<T> createIntIdentifiable(T[] constants) {
+		return new Codec<>() {
+
+			@Override
+			public T decode(DataInputWrapper in) throws IOException {
+				return in.readId(constants);
+			}
+
+			@Override
+			public void encode(DataOutputWrapper out, T value) throws IOException {
+				out.writeId(value);
 			}
 
 		};

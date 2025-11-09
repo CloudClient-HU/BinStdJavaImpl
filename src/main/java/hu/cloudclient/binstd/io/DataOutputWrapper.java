@@ -2,6 +2,7 @@ package hu.cloudclient.binstd.io;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import hu.cloudclient.binstd.IntIdentifiable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.ToIntFunction;
 
 public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
 
@@ -88,6 +90,14 @@ public record DataOutputWrapper(DataOutput delegate) implements DataOutput {
 
 	public void writeEnum(Enum<?> instance) throws IOException {
 		writeVar32(instance.ordinal());
+	}
+
+	public <T> void writeId(T value, ToIntFunction<T> idGetter) throws IOException {
+		writeVar32(idGetter.applyAsInt(value));
+	}
+
+	public void writeId(IntIdentifiable value) throws IOException {
+		writeVar32(value.getIntId());
 	}
 
 	public <T> void writeNullable(@Nullable T value, Encoder<T> encoder) throws IOException {

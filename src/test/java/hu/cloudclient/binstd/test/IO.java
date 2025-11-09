@@ -1,5 +1,6 @@
 package hu.cloudclient.binstd.test;
 
+import hu.cloudclient.binstd.IntIdentifiableEnum;
 import hu.cloudclient.binstd.io.Codec;
 import hu.cloudclient.binstd.io.Codecs;
 import hu.cloudclient.binstd.io.DataInputWrapper;
@@ -189,18 +190,35 @@ public class IO {
 		validate(UUID.fromString("fda88f8d-7cae-4f2a-9a50-62f319b35635"), codec, 16);
 	}
 
-	enum TestEnum {
+	enum TestEnum implements IntIdentifiableEnum {
 		FOO,
 		BAR,
 		FOOBAR;
+
+		public static final Codec<TestEnum> CODEC = Codecs.createEnum(TestEnum.class);
+		public static final Codec<TestEnum> CODEC_2 = Codecs.createIntIdentifiable(TestEnum.values());
+		public static final Codec<TestEnum> CODEC_3 = Codecs.createIntIdentifiable(TestEnum.values(), TestEnum::ordinal);
+		public static final Codec<TestEnum> CODEC_4 = Codecs.createIntIdentifiable(i -> TestEnum.values()[i], TestEnum::ordinal);
 	}
 
 	@Test
 	public void testEnum() {
-		Codec<TestEnum> codec = Codecs.createEnum(TestEnum.class);
-		validateExactly(TestEnum.FOO, codec, 0x00);
-		validateExactly(TestEnum.BAR, codec, 0x01);
-		validateExactly(TestEnum.FOOBAR, codec, 0x02);
+		validateExactly(TestEnum.FOO, TestEnum.CODEC, 0x00);
+		validateExactly(TestEnum.BAR, TestEnum.CODEC, 0x01);
+		validateExactly(TestEnum.FOOBAR, TestEnum.CODEC, 0x02);
+	}
+
+	@Test
+	public void testIntIdentifiable() {
+		validateExactly(TestEnum.FOO, TestEnum.CODEC_2, 0x00);
+		validateExactly(TestEnum.FOO, TestEnum.CODEC_3, 0x00);
+		validateExactly(TestEnum.FOO, TestEnum.CODEC_4, 0x00);
+		validateExactly(TestEnum.BAR, TestEnum.CODEC_2, 0x01);
+		validateExactly(TestEnum.BAR, TestEnum.CODEC_3, 0x01);
+		validateExactly(TestEnum.BAR, TestEnum.CODEC_4, 0x01);
+		validateExactly(TestEnum.FOOBAR, TestEnum.CODEC_2, 0x02);
+		validateExactly(TestEnum.FOOBAR, TestEnum.CODEC_3, 0x02);
+		validateExactly(TestEnum.FOOBAR, TestEnum.CODEC_4, 0x02);
 	}
 
 	@Test
@@ -218,7 +236,7 @@ public class IO {
 			Codecs.F64, Vec3d::z
 		);
 
-		public static final Codec<Vec3d> KINDA_WORKS_BUT_THIS_IS_A_SHITTY_SOLUTION_CODEC = new Codec<>() {
+		public static final Codec<Vec3d> KINDA_WORKS_BUT_THIS_IS_NOT_AN_OPTIMAL_SOLUTION_CODEC = new Codec<>() {
 
 			@Override
 			public Vec3d decode(DataInputWrapper in) throws IOException {
@@ -239,7 +257,7 @@ public class IO {
 	@Test
 	public void testCustom() {
 		validate(new Vec3d(420, 69, 0), Vec3d.CODEC, 3 * 8);
-		validate(new Vec3d(420, 69, 0), Vec3d.KINDA_WORKS_BUT_THIS_IS_A_SHITTY_SOLUTION_CODEC, 3 * 8);
+		validate(new Vec3d(420, 69, 0), Vec3d.KINDA_WORKS_BUT_THIS_IS_NOT_AN_OPTIMAL_SOLUTION_CODEC, 3 * 8);
 	}
 
 	@Test

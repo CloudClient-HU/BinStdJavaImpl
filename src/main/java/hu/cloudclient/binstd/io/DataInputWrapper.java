@@ -138,10 +138,25 @@ public final class DataInputWrapper implements DataInput {
 		}
 
 		if (ordinal < 0 || ordinal > constants.length) {
-			throw new IOException("enum ordinal " + ordinal + " for class" + clazz.getName() + " is out of bounds");
+			throw new IOException("enum ordinal " + ordinal + " for class " + clazz.getName() + " is out of bounds");
 		}
 
 		return constants[ordinal];
+	}
+
+	public <T> T readId(IntFunction<T> valueGetter) throws IOException {
+		int id = readVar32();
+		return valueGetter.apply(id);
+	}
+
+	public <T> T readId(T[] constants) throws IOException {
+		int id = readVar32();
+
+		if (id < 0 || id > constants.length) {
+			throw new IOException("id " + id + " is out of bounds");
+		}
+
+		return constants[id];
 	}
 
 	@Nullable

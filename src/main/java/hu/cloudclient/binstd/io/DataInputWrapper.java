@@ -27,7 +27,7 @@ public final class DataInputWrapper implements DataInput {
 	}
 
 	public DataInputWrapper(DataInput delegate) {
-		this(delegate, Config.DEFAULT);
+		this(delegate, Config.UNRESTRICTED);
 	}
 
 	public DataInputWrapper(byte[] data, Config config) {
@@ -35,7 +35,7 @@ public final class DataInputWrapper implements DataInput {
 	}
 
 	public DataInputWrapper(byte[] data) {
-		this(ByteStreams.newDataInput(data), Config.DEFAULT);
+		this(ByteStreams.newDataInput(data), Config.UNRESTRICTED);
 	}
 
 	public int bytesRead() {
@@ -431,9 +431,8 @@ public final class DataInputWrapper implements DataInput {
 	}
 
 	public record Config(int maxUTF8Size, int maxArrayLength, int maxMapSize) {
-
 		public static final Config UNRESTRICTED = new Config(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
-		public static final Config DEFAULT = new Config(16383, 16383, 16383);
+		public static final Config RESTRICTED_OPTIMAL = new Config(16383, 16383, 16383);
 
 	}
 

@@ -18,7 +18,7 @@ import java.util.function.IntFunction;
 public final class DataInputWrapper implements DataInput {
 
 	private final DataInput delegate;
-	private final Config config;
+	public final Config config;
 	private int bytesRead = 0;
 
 	public DataInputWrapper(DataInput delegate, Config config) {
